@@ -14,6 +14,25 @@ export default function Home() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    const saved = localStorage.getItem('movie-night-user')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        setUser(parsed)
+        setRoomCode(parsed.roomId)
+        setScreen('swipe')
+        loadMovies()
+      } catch {}
+    }
+  }, [])
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('movie-night-user', JSON.stringify(user))
+    }
+  }, [user])
+
   const showToast = useAppStore((s) => s.showToast)
   const setDeck = useAppStore((s) => s.setDeck)
 
@@ -81,22 +100,34 @@ export default function Home() {
     return (
       <div className="min-h-[100dvh] bg-[#0d0d0d]">
         {user && (
-          <div className="px-5 pt-4 flex items-center justify-between">
-            <div>
-              <h1 className="text-lg font-semibold bg-gradient-to-r from-warm to-red-400 bg-clip-text text-transparent">
-                🎬 Movie Night
-              </h1>
-              <p className="text-xs text-ink-400">
-                {user.name} · Room: <span className="font-mono text-white">{roomCode}</span>
-              </p>
-            </div>
-            <button
-              onClick={() => navigator.clipboard?.writeText(roomCode)}
-              className="text-xs bg-surface-soft px-3 py-1.5 rounded-lg text-white"
-            >
-              Copy Code
-            </button>
-          </div>
+           <div className="px-5 pt-4 flex items-center justify-between">
+             <div>
+               <h1 className="text-lg font-semibold bg-gradient-to-r from-warm to-red-400 bg-clip-text text-transparent">
+                 🎬 Movie Night
+               </h1>
+               <p className="text-xs text-ink-400">
+                 {user.name} · Room: <span className="font-mono text-white">{roomCode}</span>
+               </p>
+             </div>
+             <div className="flex gap-2">
+               <button
+                 onClick={() => navigator.clipboard?.writeText(roomCode)}
+                 className="text-xs bg-surface-soft px-3 py-1.5 rounded-lg text-white"
+               >
+                 Copy Code
+               </button>
+               <button
+                 onClick={() => {
+                   localStorage.removeItem('movie-night-user')
+                   setUser(null)
+                   setScreen('setup')
+                 }}
+                 className="text-xs bg-red-500/20 px-3 py-1.5 rounded-lg text-red-400"
+               >
+                 Leave
+               </button>
+             </div>
+           </div>
         )}
         <SwipeView />
       </div>
