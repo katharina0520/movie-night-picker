@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id])
+  swipes    Swipe[]
+  createdAt DateTime @default(now())
+
+  @@unique([name, roomId])
+}
+
+model Room {
+  id        String   @id
+  users     User[]
+  swipes    Swipe[]
+  createdAt DateTime @default(now())
+}
+
+model Movie {
+  id          Int     @id
+  tmdbId      Int     @unique
+  title       String
+  posterPath  String?
+  backdropPath String?
+  overview    String
+  releaseYear String
+  rating      Float
+  genres      String
+  runtime     Int?
+  swipes      Swipe[]
+}
+
+model Swipe {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id])
+  movieId   Int
+  movie     Movie    @relation(fields: [movieId], references: [id])
+  direction String
+  swipedAt  DateTime @default(now())
+
+  @@unique([userId, movieId])
+}
