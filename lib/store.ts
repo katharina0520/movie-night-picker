@@ -23,7 +23,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   hideToast: () => set({ toast: null }),
   deck: [],
-  setDeck: (movies) => set({ deck: movies }),
+  setDeck: (movies) => set({ deck: Array.isArray(movies) ? movies : [] }),
   advanceDeck: () => {
     const { deck } = get()
     set({ deck: deck.slice(1) })

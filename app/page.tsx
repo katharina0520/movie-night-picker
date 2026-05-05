@@ -64,10 +64,16 @@ export default function Home() {
   const loadMovies = async () => {
     try {
       const res = await fetch('/api/movies')
-      const movies: Movie[] = await res.json()
-      setDeck(movies)
+      if (!res.ok) throw new Error('Failed to fetch')
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        setDeck(data)
+      } else {
+        setDeck([])
+      }
     } catch (e) {
       showToast('Failed to load movies', 2000)
+      setDeck([])
     }
   }
 
